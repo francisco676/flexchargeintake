@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RallyUp — FLEXECHARGE Content Intake</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --blue: #4A9CF5;
+    --purple: #7B6BE6;
+    --green: #2DD4A8;
+    --flex-green: #22C55E;
+    --dark: #0F1923;
+    --card: #161F2C;
+    --border: rgba(255,255,255,0.08);
+    --gray: #8896A6;
+    --white: #F1F5F9;
+  }
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--dark);
+    color: var(--white);
+    min-height: 100vh;
+    line-height: 1.6;
+  }
+
+  .header {
+    padding: 32px 24px 0;
+    max-width: 640px;
+    margin: 0 auto;
+    text-align: center;
+  }
+  .logo-row {
+    display: flex; align-items: center; justify-content: center;
+    gap: 12px; margin-bottom: 20px;
+  }
+  .logo {
+    width: 48px; height: 48px;
+    background: linear-gradient(180deg, var(--blue), var(--purple));
+    border-radius: 14px;
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+  .logo svg { width: 26px; height: 26px; }
+  .wordmark {
+    height: 22px; width: auto;
+    display: inline-block;
+  }
+  .logo-x {
+    font-size: 16px; color: rgba(255,255,255,0.25); font-weight: 500;
+  }
+  .header h1 { font-size: 26px; font-weight: 800; margin-bottom: 8px; }
+  .header p { color: var(--gray); font-size: 15px; max-width: 480px; margin: 0 auto 8px; }
+  .header .time-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(45,212,168,0.1); border: 1px solid rgba(45,212,168,0.25);
+    color: var(--green); font-size: 13px; font-weight: 600;
+    padding: 6px 16px; border-radius: 50px; margin-top: 12px;
+  }
+
+  .progress-wrap {
+    max-width: 640px; margin: 28px auto 0; padding: 0 24px;
+  }
+  .progress-bar {
+    height: 4px; background: rgba(255,255,255,0.06); border-radius: 4px; overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%; width: 0%;
+    background: linear-gradient(90deg, var(--blue), var(--purple));
+    border-radius: 4px; transition: width 0.5s cubic-bezier(0.22,1,0.36,1);
+  }
+  .progress-label {
+    display: flex; justify-content: space-between; margin-top: 8px;
+    font-size: 12px; color: var(--gray); font-weight: 500;
+  }
+
+  .container {
+    max-width: 640px; margin: 0 auto; padding: 24px 24px 120px;
+  }
+
+  .section {
+    display: none; animation: fadeIn 0.4s ease;
+  }
+  .section.active { display: block; }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .section-label {
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 1.5px; color: var(--blue); margin-bottom: 8px;
+  }
+  .section-title {
+    font-size: 22px; font-weight: 700; margin-bottom: 4px;
+  }
+  .section-desc {
+    font-size: 14px; color: var(--gray); margin-bottom: 28px;
+  }
+
+  .question {
+    margin-bottom: 28px;
+  }
+  .q-label {
+    font-size: 15px; font-weight: 600; margin-bottom: 4px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .q-label .opt {
+    font-size: 11px; color: var(--gray); font-weight: 400;
+    background: rgba(255,255,255,0.05); padding: 2px 8px; border-radius: 4px;
+  }
+  .q-hint {
+    font-size: 13px; color: var(--gray); margin-bottom: 10px;
+  }
+
+  textarea, input[type="text"], input[type="url"] {
+    width: 100%; background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 14px 16px; color: var(--white);
+    font-family: inherit; font-size: 15px; resize: none;
+    transition: border-color 0.2s; outline: none;
+  }
+  textarea:focus, input[type="text"]:focus, input[type="url"]:focus {
+    border-color: rgba(74,156,245,0.5);
+  }
+  textarea { min-height: 80px; }
+  textarea.short { min-height: 56px; }
+
+  .inline-text {
+    margin-top: 10px; display: none;
+  }
+  .inline-text.show { display: block; }
+
+  .chips {
+    display: flex; flex-wrap: wrap; gap: 8px;
+  }
+  .chip {
+    padding: 10px 18px; border-radius: 50px;
+    background: var(--card); border: 1px solid var(--border);
+    font-size: 14px; font-weight: 500; cursor: pointer;
+    transition: all 0.2s; user-select: none;
+  }
+  .chip:hover { border-color: rgba(74,156,245,0.4); background: rgba(74,156,245,0.08); }
+  .chip.selected {
+    background: rgba(74,156,245,0.15); border-color: var(--blue); color: var(--blue);
+  }
+
+  .nav-bar {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: rgba(15,25,35,0.92); backdrop-filter: blur(16px);
+    border-top: 1px solid var(--border); padding: 16px 24px;
+    display: flex; justify-content: space-between; align-items: center;
+    max-width: 640px; margin: 0 auto;
+    z-index: 100;
+  }
+  @media(min-width:641px) {
+    .nav-bar { left: 50%; transform: translateX(-50%); border-radius: 20px 20px 0 0; }
+  }
+  .btn {
+    padding: 12px 28px; border-radius: 12px; font-size: 15px;
+    font-weight: 600; cursor: pointer; border: none;
+    font-family: inherit; transition: all 0.2s;
+  }
+  .btn-ghost {
+    background: transparent; color: var(--gray);
+  }
+  .btn-ghost:hover { color: var(--white); }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--blue), var(--purple));
+    color: white;
+  }
+  .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+  .btn-submit {
+    background: linear-gradient(135deg, var(--green), #1DB88E);
+    color: white;
+  }
+  .btn-submit:hover { opacity: 0.9; }
+  .btn:disabled { opacity: 0.4; cursor: default; transform: none; }
+
+  .welcome { text-align: center; padding: 40px 0 0; }
+  .welcome h2 { font-size: 28px; font-weight: 800; margin-bottom: 12px; }
+  .welcome p { color: var(--gray); font-size: 16px; max-width: 460px; margin: 0 auto 32px; line-height: 1.65; }
+  .welcome-cards {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+    text-align: left; margin-bottom: 32px;
+  }
+  .wc {
+    padding: 16px; background: var(--card); border: 1px solid var(--border);
+    border-radius: 14px;
+  }
+  .wc h4 { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+  .wc p { font-size: 12px; color: var(--gray); margin: 0; }
+
+  .done { text-align: center; padding: 60px 0; }
+  .done .check {
+    width: 72px; height: 72px; border-radius: 50%;
+    background: rgba(45,212,168,0.12); border: 2px solid var(--green);
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 32px; margin-bottom: 20px;
+  }
+  .done h2 { font-size: 28px; font-weight: 800; margin-bottom: 8px; }
+  .done p { color: var(--gray); font-size: 16px; max-width: 420px; margin: 0 auto; line-height: 1.6; }
+
+  @media(max-width:480px) {
+    .welcome-cards { grid-template-columns: 1fr; }
+    .header h1 { font-size: 22px; }
+    .section-title { font-size: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo-row">
+    <div class="logo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/></svg>
+    </div>
+    <span class="logo-x">x</span>
+    <svg class="wordmark" viewBox="0 0 190 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M181.367 18.5041H174.123C172.496 18.5041 171.21 17.1918 171.21 15.5908V3.01881C171.21 2.25766 171.499 1.49652 172.05 0.971598C172.601 0.420425 173.336 0.105469 174.123 0.105469H181.367C182.023 0.105469 182.575 0.630396 182.575 1.28655C182.575 1.94271 182.023 2.49388 181.367 2.49388H174.123C173.966 2.46764 173.835 2.54638 173.73 2.65136C173.625 2.7301 173.572 2.88758 173.572 3.01881V7.90062H179.451C180.107 7.90062 180.659 8.42554 180.659 9.0817C180.659 9.73786 180.107 10.2628 179.451 10.2628H173.572V15.5908C173.572 15.8795 173.808 16.142 174.123 16.142H181.367C182.023 16.142 182.575 16.6669 182.575 17.323C182.575 17.9792 182.023 18.5041 181.367 18.5041Z" fill="#00DBDB"/>
+      <path d="M154.345 3.15004C154.345 1.47028 155.71 0.105469 157.389 0.105469H164.056C165.736 0.105469 167.1 1.47028 167.1 3.15004C167.1 3.8062 166.575 4.33112 165.919 4.33112C165.263 4.33112 164.738 3.8062 164.738 3.15004C164.738 2.75634 164.423 2.46764 164.056 2.46764H157.389C157.022 2.46764 156.707 2.75634 156.707 3.15004V15.4333C156.707 15.8007 157.022 16.1157 157.389 16.0895H164.056C164.423 16.1157 164.738 15.8007 164.738 15.4333V11.6801H161.72C161.064 11.6801 160.539 11.1289 160.539 10.4728C160.539 9.8166 161.064 9.29167 161.72 9.29167L165.919 9.31792C166.575 9.31792 167.1 9.84284 167.1 10.499V15.4333C167.1 17.1131 165.736 18.4779 164.056 18.4779H157.389C155.71 18.4779 154.345 17.1131 154.345 15.4333V3.15004Z" fill="#00DBDB"/>
+      <path d="M136.797 9.34259V2.33483C136.797 1.75741 137.007 1.20624 137.427 0.786297C137.899 0.34011 138.503 0.0776474 139.159 0.0776474H145.379C147.978 0.0251555 150.156 2.07237 150.235 4.69699V5.93057C150.235 7.11165 149.763 8.26649 148.923 9.10637C148.004 9.99874 146.77 10.5237 145.458 10.5499L149.763 16.5866C150.156 17.1377 150.025 17.8726 149.5 18.2401C148.949 18.6338 148.214 18.5025 147.847 17.9776L142.702 10.7599C142.65 10.6811 142.624 10.6287 142.597 10.5499H139.159V17.2952C139.159 17.9514 138.634 18.4763 137.978 18.4763C137.322 18.4763 136.797 17.9514 136.797 17.2952V9.34259ZM139.159 2.46606V8.18775H145.379C146.062 8.18775 146.744 7.92529 147.243 7.42661C147.637 7.03291 147.873 6.50799 147.873 5.93057V4.69699C147.794 3.38468 146.665 2.38732 145.379 2.46606H139.159Z" fill="#00DBDB"/>
+      <path d="M118.505 18.4515C117.901 18.2153 117.613 17.5329 117.849 16.9292L124.043 0.840245C124.227 0.394058 124.647 0.0791016 125.145 0.0791016H125.723C126.248 0.0791016 126.694 0.394058 126.851 0.866491L132.626 16.9555C132.757 17.3492 132.678 17.7953 132.416 18.1365C132.153 18.4515 131.707 18.609 131.287 18.5302C130.867 18.4515 130.526 18.1628 130.395 17.7691L128.767 13.281H121.786L120.054 17.7953C119.817 18.399 119.135 18.6877 118.505 18.4515ZM125.408 3.88481L122.704 10.8926H127.927L125.408 3.88481Z" fill="#00DBDB"/>
+      <path d="M103.264 1.20733V7.84764H111.295V1.18108C111.295 0.524925 111.82 0 112.476 0C113.132 0 113.657 0.524925 113.657 1.18108V17.3225C113.657 17.9787 113.132 18.5036 112.476 18.5036C111.82 18.5036 111.295 17.9787 111.295 17.3225V10.2361H103.264V17.3225C103.264 17.9787 102.739 18.5036 102.082 18.5036C101.426 18.5036 100.901 17.9787 100.901 17.3225V1.20733C100.901 0.551171 101.426 0.0262459 102.082 0.0262459C102.739 0.0262459 103.264 0.551171 103.264 1.20733Z" fill="#00DBDB"/>
+      <path d="M93.5628 18.5037H87.08C85.3477 18.5299 83.9042 17.1651 83.8779 15.4329V3.1496C83.8779 2.30972 84.2191 1.52233 84.849 0.971163C85.4527 0.393744 86.2401 0.0787884 87.08 0.105034H93.5628C94.4289 0.105034 95.2688 0.446236 95.8987 1.07615C96.4762 1.62732 96.7911 2.41471 96.7649 3.2021V3.72702C96.7649 4.38318 96.2137 4.9081 95.5575 4.9081C94.9014 4.88186 94.3764 4.35693 94.4027 3.70078V3.17585C94.4027 3.01837 94.324 2.83465 94.219 2.72966C94.0352 2.57219 93.799 2.4672 93.5628 2.4672H87.08C86.8438 2.4672 86.6338 2.54594 86.4501 2.70342C86.3188 2.8084 86.2401 2.99213 86.2401 3.1496V15.4329C86.2926 15.8528 86.66 16.1678 87.08 16.1415H93.5628C93.9828 16.1678 94.3764 15.8528 94.4027 15.4329V13.2019C94.4027 12.5458 94.9539 12.0209 95.5838 12.0209C96.2399 12.0209 96.7911 12.5458 96.7911 13.2019V15.4329C96.7386 17.1651 95.2951 18.5299 93.5628 18.5037Z" fill="#00DBDB"/>
+      <path d="M49.1129 0.603792L53.7323 7.21786L58.3254 0.603792C58.5616 0.26259 58.9815 0.0526197 59.4015 0.0788656C59.8214 0.131359 60.2151 0.393822 60.3726 0.787516C60.5563 1.15496 60.5301 1.6274 60.2676 1.9686L55.1758 9.29132L60.2676 16.5878C60.5301 16.9552 60.5563 17.4014 60.3726 17.7951C60.2151 18.1626 59.8214 18.425 59.4015 18.4775C58.9815 18.5038 58.5616 18.2938 58.3254 17.9526L53.7323 11.3648L49.1129 17.9526C48.8767 18.2938 48.4568 18.5038 48.0368 18.4775C47.6169 18.425 47.2494 18.1626 47.0657 17.7951C46.882 17.4014 46.9082 16.9552 47.1707 16.5878L52.2625 9.29132L47.1707 1.9686C46.9082 1.6274 46.882 1.15496 47.0657 0.787516C47.2494 0.393822 47.6169 0.131359 48.0368 0.105112C48.4568 0.0526197 48.8767 0.26259 49.1129 0.603792Z" fill="#00DBDB"/>
+      <path d="M41.6309 18.5041H34.387C32.7597 18.5041 31.4736 17.1918 31.4736 15.5908V3.01881C31.4736 2.25766 31.7623 1.49652 32.3135 0.971598C32.8647 0.420425 33.5996 0.105469 34.387 0.105469H41.6309C42.2871 0.105469 42.8383 0.630396 42.8383 1.28655C42.8383 1.94271 42.2871 2.49388 41.6309 2.49388H34.387C34.2295 2.46764 34.0983 2.54638 33.9933 2.65136C33.8883 2.7301 33.8358 2.88758 33.8358 3.01881V7.90062H39.715C40.3711 7.90062 40.9223 8.42554 40.9223 9.0817C40.9223 9.73786 40.3711 10.2628 39.715 10.2628H33.8358V15.5908C33.8358 15.8795 34.072 16.142 34.387 16.142H41.6309C42.2871 16.142 42.8383 16.6669 42.8383 17.323C42.8383 17.9792 42.2871 18.5041 41.6309 18.5041Z" fill="#00DBDB"/>
+      <path d="M18.02 0.0258789C18.6761 0.0258789 19.201 0.550804 19.201 1.20696V15.4325C19.201 15.6162 19.2798 15.7999 19.3848 15.9311C19.5422 16.0361 19.6997 16.1149 19.9097 16.1149H26.1825C26.8387 16.1149 27.3636 16.6398 27.3636 17.2959C27.3636 17.9521 26.8387 18.5033 26.1825 18.5033H19.8834C18.2037 18.5033 16.8389 17.1385 16.8389 15.4325V1.20696C16.8389 0.550804 17.3638 0.0258789 18.02 0.0258789Z" fill="#00DBDB"/>
+      <path d="M2.36217 10.8402V17.3493C2.36217 18.0054 1.83724 18.5304 1.18108 18.5304C0.524926 18.5304 0 18.0054 0 17.3493V3.17629C0 2.3364 0.314955 1.57526 0.892374 0.997844C1.46979 0.420425 2.25718 0.105469 3.07082 0.105469H11.5484C12.2045 0.105469 12.7295 0.630396 12.7295 1.28655C12.7295 1.94271 12.2045 2.46764 11.5484 2.46764H3.07082C2.88709 2.46764 2.70337 2.54638 2.57214 2.67761C2.4409 2.80884 2.36217 2.99256 2.36217 3.17629V8.47803H9.5274C10.1836 8.47803 10.7085 9.00296 10.7085 9.65912C10.7085 10.3153 10.1836 10.8402 9.5274 10.8402H2.36217Z" fill="#00DBDB"/>
+      <path d="M187.607 0.0464341C187.638 0.0606931 187.663 0.0820815 187.68 0.110599L188.381 1.30835L189.078 0.124858C189.089 0.107035 189.102 0.0927758 189.12 0.0820815C189.189 0.0107868 189.293 -0.0141665 189.387 0.0214809C189.481 0.0535636 189.543 0.146247 189.543 0.24606V2.34569C189.543 2.43481 189.474 2.50967 189.387 2.50967C189.3 2.50967 189.231 2.43481 189.231 2.34569V0.492027L188.544 1.6577C188.516 1.70404 188.464 1.73256 188.409 1.73256C188.398 1.73256 188.391 1.73256 188.381 1.72899C188.37 1.73256 188.363 1.73256 188.353 1.73256C188.298 1.73256 188.246 1.70404 188.218 1.6577L187.538 0.492027V2.34926C187.538 2.43481 187.468 2.50967 187.382 2.50967C187.295 2.50967 187.226 2.43481 187.226 2.34926V0.24606C187.226 0.146247 187.288 0.0535636 187.382 0.0214809C187.455 -0.00703689 187.541 0.00365717 187.607 0.0464341Z" fill="#00DBDB"/>
+      <path d="M185.269 0.320827C185.183 0.320827 185.113 0.249532 185.113 0.160413C185.113 0.0712947 185.183 0 185.269 0L186.758 0C186.844 0 186.914 0.0712947 186.914 0.160413C186.914 0.249532 186.844 0.320827 186.758 0.320827H186.171V2.3456C186.171 2.43472 186.099 2.50601 186.012 2.50601C185.929 2.50601 185.856 2.43472 185.856 2.3456V0.320827H185.269Z" fill="#00DBDB"/>
+      <rect x="67.0146" y="15.9502" width="12.9133" height="2.44712" rx="1.22356" fill="#00DBDB"/>
+      <rect x="67.0146" width="12.9133" height="2.44712" rx="1.22356" fill="#00DBDB"/>
+      <rect x="63.0479" y="7.9751" width="12.9133" height="2.44712" rx="1.22356" fill="#F79494"/>
+    </svg>
+  </div>
+  <h1>Executive Content Intake</h1>
+  <p>Seven quick questions so we can write content that actually sounds like you.</p>
+  <div class="time-badge">Takes about 6 minutes</div>
+</div>
+
+<div class="progress-wrap">
+  <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+  <div class="progress-label">
+    <span id="sectionLabel">Welcome</span>
+    <span id="progressPct">0%</span>
+  </div>
+</div>
+
+<div class="container" id="app"></div>
+
+<div class="nav-bar">
+  <button class="btn btn-ghost" id="btnBack" onclick="goBack()">Back</button>
+  <button class="btn btn-primary" id="btnNext" onclick="goNext()">Get Started</button>
+</div>
+
+<script>
+const sections = [
+  // 0: Welcome
+  { id: 'welcome', label: 'Welcome', render: () => `
+    <div class="welcome">
+      <h2>Hey Jan</h2>
+      <p>We've already mapped a lot from your 100 LinkedIn posts and your profile. This form fills the gaps that posts alone can't tell us. No need to overthink anything, just answer quickly and honestly.</p>
+      <div class="welcome-cards">
+        <div class="wc"><h4>5 short sections</h4><p>Mostly tap to answer</p></div>
+        <div class="wc"><h4>About 6 minutes</h4><p>Built for busy founders</p></div>
+        <div class="wc"><h4>No wrong answers</h4><p>Your real perspective is what we need</p></div>
+        <div class="wc"><h4>Stays between us</h4><p>Only shared with your content team</p></div>
+      </div>
+    </div>
+  `},
+
+  // 1: Origin
+  { id: 'origin', label: 'Origin', render: () => `
+    <div class="section-label">Section 1 of 5</div>
+    <div class="section-title">The spark</div>
+    <div class="section-desc">Every founder has a story. We want the real one, not the tidy one.</div>
+
+    <div class="question">
+      <div class="q-label">What was the moment that made you start FLEXECHARGE?</div>
+      <div class="q-hint">A project, a conversation, a realization. Whatever tipped you from "I should do this" to "I'm doing this."</div>
+      <textarea data-key="origin_moment" placeholder="e.g. I was running a project at ABENA and kept hitting the same wall with charging infrastructure. One specific conversation with an operator made me realize nobody was solving the actual problem."></textarea>
+    </div>
+  `},
+
+  // 2: DACH
+  { id: 'dach', label: 'DACH', render: () => `
+    <div class="section-label">Section 2 of 5</div>
+    <div class="section-title">German content</div>
+    <div class="section-desc">Your German posts average 31 reactions vs 19 for English, but only 7% of your posts are German. Worth rebalancing?</div>
+
+    <div class="question">
+      <div class="q-label">What fits for the next few months?</div>
+      <div class="q-hint">Pick any that apply.</div>
+      <div class="chips" data-key="dach_direction" data-multi="true">
+        <div class="chip">Write more in German</div>
+        <div class="chip">Only for DACH-specific topics</div>
+        <div class="chip">Keep current English-heavy mix</div>
+        <div class="chip">Target a DACH community specifically</div>
+        <div class="chip">Mix German and English in the same post</div>
+        <div class="chip">Not sure, you decide</div>
+      </div>
+    </div>
+  `},
+
+  // 3: Customers
+  { id: 'customers', label: 'Customers', render: () => `
+    <div class="section-label">Section 3 of 5</div>
+    <div class="section-title">Real projects</div>
+    <div class="section-desc">The best posts come from real work. Pick who's fair game, then tell us about one project.</div>
+
+    <div class="question">
+      <div class="q-label">Which customers can we reference in posts?</div>
+      <div class="q-hint">Only selected names will be named publicly.</div>
+      <div class="chips" data-key="customers_ok" data-multi="true" data-reveal="Other">
+        <div class="chip">Recharge</div>
+        <div class="chip">Q8</div>
+        <div class="chip">Electra</div>
+        <div class="chip">Other</div>
+      </div>
+      <div class="inline-text" data-reveal-for="Other">
+        <input type="text" data-key="customers_other" placeholder="Which other customers? (comma-separated)">
+      </div>
+    </div>
+
+    <div class="question">
+      <div class="q-label">Pick one project. What changed for them?</div>
+      <div class="q-hint">Before vs after, ideally with a number. Can be anonymized if needed.</div>
+      <textarea data-key="customer_story" placeholder="e.g. With Recharge, they went from X% uptime to Y% after we deployed Z. Or: one operator cut peak demand charges by 40% in the first quarter."></textarea>
+    </div>
+  `},
+
+  // 4: Christophe
+  { id: 'christophe', label: 'Co-founder', render: () => `
+    <div class="section-label">Section 4 of 5</div>
+    <div class="section-title">You and Christophe</div>
+    <div class="section-desc">You both post from FLEXECHARGE with very different voices. He's brand energy, you're industry insight. We want to know how you see the split.</div>
+
+    <div class="question">
+      <div class="q-label">How do you coordinate content with Christophe?</div>
+      <div class="chips" data-key="christophe_coord" data-multi="false">
+        <div class="chip">We coordinate topics regularly</div>
+        <div class="chip">We post independently, no sync</div>
+        <div class="chip">We've split lanes (he covers culture, I cover insight)</div>
+        <div class="chip">Honestly, we don't really sync</div>
+      </div>
+    </div>
+  `},
+
+  // 5: Untapped
+  { id: 'untapped', label: 'Hot takes', render: () => `
+    <div class="section-label">Section 5 of 5</div>
+    <div class="section-title">What you haven't said yet</div>
+    <div class="section-desc">Often the most useful content is what you've been holding back.</div>
+
+    <div class="question">
+      <div class="q-label">What strong industry opinion have you not posted yet?</div>
+      <div class="q-hint">Doesn't have to be a hot take. Just something you believe that you haven't put out there.</div>
+      <textarea data-key="untapped_opinion" placeholder="e.g. Most CPOs are still optimizing for hardware count when they should be optimizing for utilization per site."></textarea>
+    </div>
+
+    <div class="question">
+      <div class="q-label">What's been holding you back from posting it?</div>
+      <div class="chips" data-key="held_back_why" data-multi="false">
+        <div class="chip">Too controversial</div>
+        <div class="chip">Don't want to upset partners or customers</div>
+        <div class="chip">Not sure how to frame it</div>
+        <div class="chip">Just haven't gotten to it</div>
+      </div>
+    </div>
+  `},
+
+  // 6: Done
+  { id: 'done', label: 'Done', render: () => `
+    <div class="done">
+      <div class="check">&#10003;</div>
+      <h2>That's it. Thanks Jan.</h2>
+      <p>We've got what we need to start writing in your voice. Your content engineer will go through everything and might reach out for a quick follow up if anything needs clarifying. First drafts coming soon.</p>
+    </div>
+  `}
+];
+
+let current = 0;
+const answers = {};
+
+function render() {
+  const app = document.getElementById('app');
+  app.innerHTML = `<div class="section active">${sections[current].render()}</div>`;
+
+  app.querySelectorAll('[data-key]').forEach(el => {
+    const k = el.dataset.key;
+    if (answers[k] !== undefined) {
+      if (el.tagName === 'TEXTAREA' || el.tagName === 'INPUT') {
+        el.value = answers[k];
+      } else if (el.classList.contains('chips')) {
+        const selected = Array.isArray(answers[k]) ? answers[k] : [answers[k]];
+        el.querySelectorAll('.chip').forEach(c => {
+          if (selected.includes(c.textContent)) c.classList.add('selected');
+        });
+      }
+    }
+  });
+
+  app.querySelectorAll('.chips').forEach(container => {
+    const multi = container.dataset.multi === 'true';
+    const revealLabel = container.dataset.reveal;
+    container.querySelectorAll('.chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        if (!multi) container.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
+        chip.classList.toggle('selected');
+        if (revealLabel) toggleReveal(container, revealLabel);
+        saveAll();
+      });
+    });
+    if (revealLabel) toggleReveal(container, revealLabel);
+  });
+
+  app.querySelectorAll('textarea, input').forEach(el => {
+    el.addEventListener('input', () => saveAll());
+  });
+
+  updateUI();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function toggleReveal(container, label) {
+  const selected = [...container.querySelectorAll('.chip.selected')].map(c => c.textContent);
+  const reveal = container.parentElement.querySelector(`[data-reveal-for="${label}"]`);
+  if (!reveal) return;
+  if (selected.includes(label)) reveal.classList.add('show');
+  else reveal.classList.remove('show');
+}
+
+function saveAll() {
+  const app = document.getElementById('app');
+  app.querySelectorAll('[data-key]').forEach(el => {
+    const k = el.dataset.key;
+    if (el.tagName === 'TEXTAREA' || el.tagName === 'INPUT') {
+      answers[k] = el.value;
+    } else if (el.classList.contains('chips')) {
+      const sel = [...el.querySelectorAll('.chip.selected')].map(c => c.textContent);
+      answers[k] = el.dataset.multi === 'true' ? sel : (sel[0] || '');
+    }
+  });
+}
+
+function updateUI() {
+  const total = sections.length - 1;
+  const pct = current === 0 ? 0 : current >= total ? 100 : Math.round((current / total) * 100);
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressPct').textContent = pct + '%';
+  document.getElementById('sectionLabel').textContent = sections[current].label;
+
+  const back = document.getElementById('btnBack');
+  const next = document.getElementById('btnNext');
+
+  back.style.visibility = current === 0 ? 'hidden' : 'visible';
+
+  if (current === 0) {
+    next.textContent = 'Get Started';
+    next.className = 'btn btn-primary';
+  } else if (current === sections.length - 2) {
+    next.textContent = 'Submit';
+    next.className = 'btn btn-submit';
+  } else if (current === sections.length - 1) {
+    next.style.display = 'none';
+    back.style.display = 'none';
+    document.querySelector('.nav-bar').style.display = 'none';
+  } else {
+    next.textContent = 'Continue';
+    next.className = 'btn btn-primary';
+  }
+}
+
+function goNext() {
+  saveAll();
+  if (current < sections.length - 1) {
+    current++;
+    render();
+  }
+  if (current === sections.length - 1) {
+    fetch('https://script.google.com/macros/s/AKfycbwiECOki0F876OSTvb9KiF3_b65qIApkzpXwBhpZ_IT_BUaFITeYqu83v89E0NYV5-C/exec', {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(answers)
+    });
+  }
+}
+
+function goBack() {
+  saveAll();
+  if (current > 0) { current--; render(); }
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && e.metaKey) goNext();
+});
+
+render();
+</script>
+</body>
+</html>
